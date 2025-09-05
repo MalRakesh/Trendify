@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +8,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Header -->
     <header>
         <div class="container">
             <div class="navbar">
                 <div class="logo">
-                    <a href="index.php">Trendify</a>
+                    <a href="index.html">Trendify</a>
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="products.php">Shop</a></li>
-                        <li><a href="cart.php">Cart</a></li>
-                        <?php if (isLoggedIn()): ?>
-                            <li><a href="../backend/logout.php">Logout</a></li>
-                        <?php else: ?>
-                            <li><a href="login.php">Login</a></li>
-                            <li><a href="register.php">Register</a></li>
-                        <?php endif; ?>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
                     </ul>
                 </nav>
             </div>
@@ -37,7 +35,7 @@
         <div class="container">
             <h1>Style That Speaks</h1>
             <p>Discover the latest trends in fashion at unbeatable prices.</p>
-            <a href="products.php" class="btn">Shop Now</a>
+            <a href="products.html" class="btn">Shop Now</a>
         </div>
     </section>
 
@@ -45,22 +43,8 @@
         <!-- Featured Products -->
         <section class="featured">
             <h2>Featured Products</h2>
-            <?php echo getMessage(); ?>
-            <div class="product-grid">
-                <?php if ($featured_result->num_rows > 0): ?>
-                    <?php while ($product = $featured_result->fetch_assoc()): ?>
-                        <div class="product-card">
-                            <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>" class="product-img">
-                            <div class="product-info">
-                                <h3><?php echo htmlspecialchars($product['name']); ?></h3>
-                                <p class="product-price">₹<?php echo number_format($product['price'], 2); ?></p>
-                                <button class="add-to-cart" data-id="<?php echo $product['id']; ?>">Add to Cart</button>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p>No featured products available.</p>
-                <?php endif; ?>
+            <div id="featured-products" class="product-grid">
+                <!-- JS will populate -->
             </div>
         </section>
 
@@ -68,17 +52,20 @@
         <section class="categories" style="margin: 4rem 0; text-align: center;">
             <h2>Shop by Category</h2>
             <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem;">
-                <div style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div
+                    style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                     <h3>Men</h3>
-                    <a href="products.php?category=men" class="btn">Browse</a>
+                    <a href="products.html?category=men" class="btn">Browse</a>
                 </div>
-                <div style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div
+                    style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                     <h3>Women</h3>
-                    <a href="products.php?category=women" class="btn">Browse</a>
+                    <a href="products.html?category=women" class="btn">Browse</a>
                 </div>
-                <div style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div
+                    style="width: 180px; background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                     <h3>Accessories</h3>
-                    <a href="products.php?category=accessories" class="btn">Browse</a>
+                    <a href="products.html?category=accessories" class="btn">Browse</a>
                 </div>
             </div>
         </section>
@@ -87,11 +74,13 @@
         <section class="testimonials" style="margin: 4rem 0; padding: 3rem; background: #f1f1f1; border-radius: 10px;">
             <h2>What Our Customers Say</h2>
             <div style="display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div
+                    style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <p>"Amazing quality and fast delivery! Will shop again."</p>
                     <strong>- Priya S.</strong>
                 </div>
-                <div style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div
+                    style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <p>"Trendy clothes at great prices. Love this store!"</p>
                     <strong>- Rohan K.</strong>
                 </div>
@@ -99,7 +88,8 @@
         </section>
 
         <!-- Newsletter -->
-        <section class="newsletter" style="margin: 4rem 0; text-align: center; padding: 3rem; background: #3498db; color: white; border-radius: 10px;">
+        <section class="newsletter"
+            style="margin: 4rem 0; text-align: center; padding: 3rem; background: #3498db; color: white; border-radius: 10px;">
             <h2>Subscribe to Our Newsletter</h2>
             <p>Get updates on new arrivals and exclusive offers.</p>
             <form style="margin-top: 1.5rem; display: flex; max-width: 500px; margin: 1.5rem auto; gap: 0.5rem;">
@@ -112,13 +102,41 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved. | 
-                <a href="#">Privacy Policy</a> | 
+            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved. |
+                <a href="#">Privacy Policy</a> |
                 <a href="#">Terms of Service</a>
             </p>
         </div>
     </footer>
 
+    <script src="js/data.js"></script>
     <script src="js/script.js"></script>
+    <script>
+        // Load featured products on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeaturedProducts();
+        });
+
+        function loadFeaturedProducts() {
+            const container = document.getElementById('featured-products');
+            const featured = TrendifyData.products.filter(p => p.featured);
+            container.innerHTML = '';
+
+            featured.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-img">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="product-price">₹${product.price.toLocaleString()}</p>
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
 </body>
+
 </html>

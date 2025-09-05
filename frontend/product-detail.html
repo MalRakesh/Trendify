@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Trendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .product-detail {
+            display: flex;
+            gap: 3rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+        .product-image {
+            flex: 1;
+            min-width: 300px;
+        }
+        .product-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-info {
+            flex: 1;
+            min-width: 300px;
+        }
+        .product-description {
+            margin: 1.5rem 0;
+            line-height: 1.8;
+        }
+        .product-actions {
+            margin: 2rem 0;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            background: #f1f1f1;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .quantity {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .reviews {
+            margin-top: 3rem;
+        }
+        .review {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .rating {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html">Trendify</a>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav style="margin: 1rem 0;">
+            <a href="index.html">Home</a> > 
+            <a href="products.html">Shop</a> > 
+            <span id="product-name-breadcrumb">Loading...</span>
+        </nav>
+
+        <!-- Product Detail -->
+        <div id="product-detail-content">
+            <!-- JS will populate -->
+            <p style="text-align: center; padding: 3rem;">Loading product...</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved. | 
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Get product ID from URL
+        function getProductIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return parseInt(params.get('id'));
+        }
+
+        // Load product detail
+        document.addEventListener('DOMContentLoaded', () => {
+            const productId = getProductIdFromUrl();
+            if (!productId) {
+                document.getElementById('product-detail-content').innerHTML = 
+                    `<p style="color: red; text-align: center;">Invalid product ID.</p>`;
+                return;
+            }
+
+            const product = TrendifyData.getProduct(productId);
+            if (!product) {
+                document.getElementById('product-detail-content').innerHTML = 
+                    `<p style="color: red; text-align: center;">Product not found.</p>`;
+                return;
+            }
+
+            // Update breadcrumb
+            document.getElementById('product-name-breadcrumb').textContent = product.name;
+
+            // Render product
+            const container = document.getElementById('product-detail-content');
+            container.innerHTML = `
+                <div class="product-detail">
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="product-info">
+                        <h1>${product.name}</h1>
+                        <p class="product-price" style="font-size: 1.8rem;">₹${product.price.toLocaleString()}</p>
+                        <p><strong>In Stock:</strong> ${product.stock} items available</p>
+                        
+                        <div class="product-description">
+                            <p>${product.description}</p>
+                        </div>
+
+                        <div class="product-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="decreaseQty()">−</button>
+                                <span id="quantity" class="quantity">1</span>
+                                <button class="quantity-btn" onclick="increaseQty()">+</button>
+                            </div>
+                            <button class="btn" onclick="addToCartFromDetail(${product.id})">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reviews">
+                    <h3>Customer Reviews</h3>
+                    ${getReviewsHtml(productId)}
+                </div>
+            `;
+        });
+
+        // Quantity control
+        let quantity = 1;
+        function increaseQty() { quantity++; document.getElementById('quantity').textContent = quantity; }
+        function decreaseQty() { if (quantity > 1) quantity--; document.getElementById('quantity').textContent = quantity; }
+
+        // Add to cart from detail
+        function addToCartFromDetail(productId) {
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            for (let i = 0; i < qty; i++) {
+                addToCart(productId);
+            }
+            alert(`${qty} item(s) added to cart!`);
+        }
+
+        // Get reviews HTML
+        function getReviewsHtml(productId) {
+            const reviews = TrendifyData.reviews.filter(r => r.productId === productId);
+            if (reviews.length === 0) {
+                return `<p>No reviews yet. Be the first to review!</p>`;
+            }
+            return reviews.map(r => `
+                <div class="review">
+                    <div class="review-header">
+                        <strong>${r.user}</strong>
+                        <span class="rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                    </div>
+                    <p>${r.comment}</p>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

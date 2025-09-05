@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Trendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #777;
+        }
+
+        .empty-cart img {
+            max-width: 200px;
+            margin-bottom: 1rem;
+        }
+
+        .checkout-section {
+            margin: 3rem 0;
+            text-align: right;
+        }
+
+        .cart-summary {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            min-width: 300px;
+            text-align: left;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-total {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html">Trendify</a>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Your Shopping Cart</h2>
+        <div id="cart-message"></div>
+
+        <table id="cart-table" class="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+                <!-- JS will populate -->
+            </tbody>
+        </table>
+
+        <div id="checkout-section" class="checkout-section">
+            <!-- JS will populate -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved. |
+                <a href="#">Privacy Policy</a> |
+                <a href="#">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+        });
+
+        function loadCart() {
+            const cart = getCart();
+            const tbody = document.getElementById('cart-items');
+            const messageDiv = document.getElementById('cart-message');
+            const checkoutSection = document.getElementById('checkout-section');
+
+            if (cart.length === 0) {
+                tbody.innerHTML = '';
+                messageDiv.innerHTML = `
+                    <div class="empty-cart">
+                        <img src="assets/empty-cart.png" alt="Empty Cart">
+                        <p>Your cart is empty!</p>
+                        <a href="products.html" class="btn">Continue Shopping</a>
+                    </div>
+                `;
+                checkoutSection.innerHTML = '';
+                return;
+            }
+
+            let cartHTML = '';
+            let grandTotal = 0;
+
+            cart.forEach(item => {
+                const product = TrendifyData.getProduct(item.id);
+                if (!product) return;
+
+                const itemTotal = product.price * item.qty;
+                grandTotal += itemTotal;
+
+                cartHTML += `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <img src="${product.image}" alt="${product.name}" width="60" style="border-radius: 8px;">
+                                <span>${product.name}</span>
+                            </div>
+                        </td>
+                        <td>₹${product.price.toLocaleString()}</td>
+                        <td>
+                            <button onclick="updateQty(${item.id}, ${item.qty - 1})" class="quantity-btn" ${item.qty <= 1 ? 'disabled' : ''}>−</button>
+                            <span>${item.qty}</span>
+                            <button onclick="updateQty(${item.id}, ${item.qty + 1})" class="quantity-btn">+</button>
+                        </td>
+                        <td>₹${itemTotal.toLocaleString()}</td>
+                        <td>
+                            <button onclick="removeFromCart(${item.id})" class="btn btn-danger" style="padding: 0.4rem 0.8rem;">Remove</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = cartHTML;
+
+            checkoutSection.innerHTML = `
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>₹${grandTotal.toLocaleString()}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span>₹50</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total:</span>
+                        <span>₹${(grandTotal + 50).toLocaleString()}</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                </div>
+            `;
+
+            messageDiv.innerHTML = '';
+        }
+
+        function proceedToCheckout() {
+            const cart = getCart();
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            alert("Redirecting to secure checkout...");
+            // In real app: redirect to payment gateway
+        }
+    </script>
+</body>
+
+</html>
