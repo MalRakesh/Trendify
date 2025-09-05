@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealer Dashboard - Trendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .dealer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .sidebar-logo a {
+            color: #f39c12;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: #bdc3c7;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .welcome {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.6rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.6rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .my-products {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .dealer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dealer-table th,
+        .dealer-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dealer-table th {
+            background: #f1f1f1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            padding: 0.7rem 1.2rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-view {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dealer-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="dashboard.html">Trendify Dealer</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="my-products.html">My Products</a></li>
+                <li><a href="reports.html">Reports</a></li>
+                <li><a href="../index.html">Visit Store</a></li>
+                <li><a href="../login.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <h1 class="welcome">Welcome, Dealer</h1>
+                <span id="current-date"></span>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Products</h3>
+                    <div class="stat-value">24</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Sales This Month</h3>
+                    <div class="stat-value">₹45,200</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Orders</h3>
+                    <div class="stat-value">18</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Revenue</h3>
+                    <div class="stat-value">₹1.2L</div>
+                </div>
+            </div>
+
+            <!-- My Products -->
+            <div class="my-products">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <h2>My Products</h2>
+                    <a href="my-products.html" class="btn-primary">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="dealer-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Sold</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-body">
+                            <!-- JS will populate -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script>
+        // Set current date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+
+        // Load dealer products (simulate: products with name containing "Men" or "Wallet")
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('products-body');
+            const dealerProducts = TrendifyData.products.filter(p =>
+                p.name.includes('Men') || p.name.includes('Wallet')
+            );
+
+            tbody.innerHTML = '';
+            dealerProducts.slice(0, 5).forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${product.image}" alt="${product.name}" class="product-img"></td>
+                    <td>${product.name}</td>
+                    <td>₹${product.price.toLocaleString()}</td>
+                    <td>${product.stock}</td>
+                    <td>12</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit" onclick="editProduct(${product.id})">Edit</button>
+                            <button class="btn btn-view" onclick="viewProduct(${product.id})">View</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+
+        function editProduct(id) {
+            alert(`Editing product ID: ${id}`);
+        }
+
+        function viewProduct(id) {
+            alert(`Viewing product ID: ${id}`);
+        }
+    </script>
+</body>
+
+</html>
