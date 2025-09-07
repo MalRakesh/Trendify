@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Trendify Dealer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .dealer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .sidebar-logo a {
+            color: #f39c12;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: #bdc3c7;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 1.1rem;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(45deg, #f1f1f1 25%, transparent 25%),
+                linear-gradient(-45deg, #f1f1f1 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f1f1f1 75%),
+                linear-gradient(-45deg, transparent 75%, #f1f1f1 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-style: italic;
+        }
+
+        .table-responsive {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .dealer-table th,
+        .dealer-table td {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .top-products {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .top-product {
+            flex: 1;
+            min-width: 200px;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .top-product img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dealer-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="dashboard.html">Trendify Dealer</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="my-products.html">My Products</a></li>
+                <li><a href="reports.html" class="active">Reports</a></li>
+                <li><a href="../index.html">Visit Store</a></li>
+                <li><a href="../login.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Sales Reports</h1>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Sales</h3>
+                    <div class="stat-value">₹45,200</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Orders</h3>
+                    <div class="stat-value">18</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg. Order Value</h3>
+                    <div class="stat-value">₹2,511</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Revenue Growth</h3>
+                    <div class="stat-value">+12.5%</div>
+                </div>
+            </div>
+
+            <!-- Sales Chart -->
+            <div class="chart-container">
+                <h2>Monthly Sales</h2>
+                <div class="chart-placeholder">
+                    [Sales Chart would appear here in real app]
+                </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="table-responsive">
+                <h2>Top Selling Products</h2>
+                <div class="top-products">
+                    <div class="top-product">
+                        <img src="../assets/product1.jpg" alt="Casual Men's Shirt">
+                        <strong>Casual Men's Shirt</strong>
+                        <p>Sold: 24 units</p>
+                    </div>
+                    <div class="top-product">
+                        <img src="../assets/product3.jpg" alt="Leather Wallet">
+                        <strong>Leather Wallet</strong>
+                        <p>Sold: 18 units</p>
+                    </div>
+                    <div class="top-product">
+                        <img src="../assets/product8.jpg" alt="Backpack">
+                        <strong>Backpack</strong>
+                        <p>Sold: 15 units</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simulate dynamic data
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Reports loaded.");
+        });
+    </script>
+</body>
+
+</html>

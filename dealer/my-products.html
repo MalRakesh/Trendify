@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products - Trendify Dealer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .dealer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .sidebar-logo a {
+            color: #f39c12;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: #bdc3c7;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .dealer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dealer-table th,
+        .dealer-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dealer-table th {
+            background: #f1f1f1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .status-active {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .status-inactive {
+            color: #e74c3c;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-view {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box input {
+            padding: 0.9rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #777;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dealer-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="dashboard.html">Trendify Dealer</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="my-products.html" class="active">My Products</a></li>
+                <li><a href="reports.html">Reports</a></li>
+                <li><a href="../index.html">Visit Store</a></li>
+                <li><a href="../login.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>My Products</h1>
+                <a href="add-product.html" class="btn-primary">+ Add New</a>
+            </div>
+
+            <!-- Search -->
+            <div class="search-filter">
+                <div class="search-box" style="flex: 1;">
+                    <input type="text" id="search-input" placeholder="Search your products..."
+                        onkeyup="filterProducts()">
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-responsive">
+                <table class="dealer-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Sold</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-body">
+                        <!-- JS will populate -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script>
+        // Load dealer products
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+        });
+
+        function loadProducts() {
+            const tbody = document.getElementById('products-body');
+            const myProducts = TrendifyData.products.filter(p =>
+                p.name.includes('Men') || p.name.includes('Wallet') || p.name.includes('Shirt')
+            );
+
+            tbody.innerHTML = '';
+
+            if (myProducts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="no-products">You haven't added any products yet.</td></tr>`;
+                return;
+            }
+
+            myProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${product.image}" alt="${product.name}" class="product-img"></td>
+                    <td>${product.name}</td>
+                    <td>₹${product.price.toLocaleString()}</td>
+                    <td>${product.stock}</td>
+                    <td>15</td>
+                    <td><span class="status-active">Active</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit" onclick="editProduct(${product.id})">Edit</button>
+                            <button class="btn btn-view" onclick="viewProduct(${product.id})">View</button>
+                            <button class="btn btn-delete" onclick="deleteProduct(${product.id})">Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#products-body tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? 'table-row' : 'none';
+            });
+        }
+
+        function editProduct(id) {
+            alert(`Editing product ID: ${id}`);
+        }
+
+        function viewProduct(id) {
+            alert(`Viewing product ID: ${id}`);
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Delete this product permanently?")) {
+                alert(`Product ID: ${id} deleted!`);
+            }
+        }
+    </script>
+</body>
+
+</html>
