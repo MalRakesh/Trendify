@@ -107,6 +107,24 @@
             color: #666;
         }
 
+        .terms-agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            margin: 1.2rem 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .terms-agreement input {
+            margin-top: 0.3rem;
+        }
+
+        .terms-agreement a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 0.9rem;
@@ -126,21 +144,10 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .terms {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #666;
-            margin: 1.5rem 0;
-        }
-
-        .terms a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
         .login-link {
             text-align: center;
             color: #555;
+            margin-top: 1.5rem;
         }
 
         .login-link a {
@@ -266,12 +273,21 @@
                         <h4>Dealer</h4>
                         <p>Sell your products</p>
                     </div>
+                    <div class="role-option" data-role="admin" onclick="selectRole(this, 'admin')">
+                        <h4>Admin</h4>
+                        <p>Manage the store</p>
+                    </div>
                 </div>
                 <input type="hidden" id="role" value="customer">
             </div>
 
-            <div class="terms">
-                By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+            <!-- Terms Agreement -->
+            <div class="terms-agreement">
+                <input type="checkbox" id="agree-terms" required>
+                <div>
+                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#"
+                        target="_blank">Privacy Policy</a>.
+                </div>
             </div>
 
             <button type="submit" class="submit-btn">Create Account</button>
@@ -292,47 +308,93 @@
 
     <script src="js/data.js"></script>
     <script src="js/script.js"></script>
-    <script>
-        // Role selection
-        function selectRole(element, role) {
-            document.querySelectorAll('.role-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            document.getElementById('role').value = role;
+<script>
+    // Role selection
+    function selectRole(element, role) {
+        document.querySelectorAll('.role-option').forEach(el => {
+            el.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        document.getElementById('role').value = role;
+    }
+
+    // Set default role
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.role-option[data-role="customer"]').classList.add('selected');
+    });
+
+    // Handle form submission
+    document.getElementById('register-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const messageDiv = document.getElementById('message');
+
+        const firstName = document.getElementById('first-name').value.trim();
+        const lastName = document.getElementById('last-name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const role = document.getElementById('role').value;
+        const agreeTerms = document.getElementById('agree-terms').checked;
+
+        // Validation
+        if (!firstName || !lastName) {
+            messageDiv.innerHTML = '<div class="alert alert-error">Please enter your first and last name.</div>';
+            return;
         }
 
-        // Set customer as default
-        document.querySelector('.role-option[data-role="customer"]').classList.add('selected');
+        if (password.length < 6) {
+            messageDiv.innerHTML = '<div class="alert alert-error">Password must be at least 6 characters.</div>';
+            return;
+        }
 
-        // Handle form submission
-        document.getElementById('register-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const messageDiv = document.getElementById('message');
+        if (password !== confirmPassword) {
+            messageDiv.innerHTML = '<div class="alert alert-error">Passwords do not match.</div>';
+            return;
+        }
 
-            const firstName = document.getElementById('first-name').value;
-            const lastName = document.getElementById('last-name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const role = document.getElementById('role').value;
+        if (!agreeTerms) {
+            messageDiv.innerHTML = '<div class="alert alert-error">You must agree to the Terms of Service and Privacy Policy.</div>';
+            return;
+        }
 
-            // Validation
-            if (password.length < 6) {
-                messageDiv.innerHTML = '<div class="alert alert-error">Password must be at least 6 characters.</div>';
-                return;
+        // Prepare data
+        const userData = {
+            name: `${firstName} ${lastName}`,
+            email: email,
+            password: password,
+            role: role,
+            phone: phone
+        };
+
+        // Show loading
+        messageDiv.innerHTML = '<div class="alert alert-success">Registering...</div>';
+
+        try {
+            const response = await fetch('backend/register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                messageDiv.innerHTML = `<div class="alert alert-success">${result.message} Redirecting...</div>`;
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            } else {
+                messageDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
             }
-            if (password !== confirmPassword) {
-                messageDiv.innerHTML = '<div class="alert alert-error">Passwords do not match.</div>';
-                return;
-            }
+        } catch (error) {
+            messageDiv.innerHTML = `<div class="alert alert-error">Network error. Check if backend is running.</div>`;
+            console.error("Error:", error);
+        }
+    });
+</script>
+</body>
 
-            // Simulate registration
-            messageDiv.innerHTML = '<div class="alert alert-success">Account created successfully! Redirecting to login...</div>';
-
-            // Simulate redirect
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
-        });
+</html>
