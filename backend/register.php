@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Database Connection
 $host = "localhost";
 $username = "root";
-$password = "";
+$password = "RakeshMal@12345";
 $database = "trendify_db";
 
 $conn = new mysqli($host, $username, $password, $database);
