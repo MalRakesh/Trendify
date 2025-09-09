@@ -12,18 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Database Connection
-$host = "localhost";
-$username = "root";
-$password = "RakeshMal@12345";
-$database = "trendify_db";
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
-    exit();
-}
+// Include config
+include 'config.php'; // ✅ ab direct config.php use hoga
 
 // Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);
@@ -36,16 +26,13 @@ if (!isset($data['name'], $data['email'], $data['password'], $data['role'])) {
 
 $name = trim($data['name']);
 $email = trim($data['email']);
-$password = $data['password']; // Will hash below
+$password = $data['password'];
 $role = $data['role'];
 $phone = $data['phone'] ?? null;
-$address = $data['address'] ?? null;
-$city = $data['city'] ?? null;
-$state = $data['state'] ?? null;
-$pincode = $data['pincode'] ?? null;
 
 // Validate role
-if (!in_array($role, ['customer', 'dealer', 'admin'])) {
+$valid_roles = ['customer', 'dealer', 'admin'];
+if (!in_array($role, $valid_roles)) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid role']);
     exit();
 }
@@ -74,18 +61,13 @@ if ($stmt->num_rows > 0) {
 $stmt->close();
 
 // Insert user
-$stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone, address, city, state, pincode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("sssssssss", $name, $email, $hashed_password, $role, $phone, $address, $city, $state, $pincode);
+$stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $name, $email, $hashed_password, $role, $phone);
 
 if ($stmt->execute()) {
     echo json_encode([
         'status' => 'success',
-        'message' => 'Registration successful',
-        'user' => [
-            'name' => $name,
-            'email' => $email,
-            'role' => $role
-        ]
+        'message' => 'Registration successful! Welcome to Trendify.'
     ]);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $stmt->error]);
