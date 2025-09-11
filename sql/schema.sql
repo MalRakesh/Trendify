@@ -207,3 +207,42 @@ INSERT INTO reviews (user_id, product_id, rating, comment) VALUES
 (3, 4, 5, 'Perfect for jogging.');
 
 -- End of schema.sql
+
+
+-- Create Profile Tables
+
+-- Customer Profile
+CREATE TABLE IF NOT EXISTS customer_profile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    total_orders INT DEFAULT 0,
+    loyalty_points INT DEFAULT 0,
+    preferred_categories VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Dealer Profile
+CREATE TABLE IF NOT EXISTS dealer_profile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    shop_name VARCHAR(100),
+    gst_number VARCHAR(15),
+    bank_account VARCHAR(50),
+    commission_rate DECIMAL(5,2) DEFAULT 10.00,
+    total_sales DECIMAL(10,2) DEFAULT 0.00,
+    is_verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Admin Profile
+CREATE TABLE IF NOT EXISTS admin_profile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    access_level ENUM('super', 'moderator') DEFAULT 'moderator',
+    last_login TIMESTAMP NULL,
+    permissions TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
