@@ -504,7 +504,7 @@
             messageDiv.innerHTML = '<div class="alert alert-success">Registering... Please wait.</div>';
 
             try {
-                const response = await fetch('backend/register.php', {
+                const response = await fetch('../backend/register.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)

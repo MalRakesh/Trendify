@@ -8,7 +8,7 @@ ini_set('display_errors', 1);
 // Database credentials (WAMP default)
 $host = "localhost";
 $username = "root";
-$password = ""; // ✅ WAMP ke liye blank
+$password = "RakeshMal@12345"; // ✅ WAMP ke liye blank
 $database = "trendify_db";
 
 // Create connection

@@ -1,78 +1,121 @@
 <?php
-// backend/register.php
+// backend/register.php - Advanced Registration
 
-// Allow CORS (for local testing)
+// Allow CORS
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
+// Include config
+include 'config.php';
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Only POST allowed']);
     exit();
 }
 
-// Include config
-include 'config.php'; // ✅ ab direct config.php use hoga
-
-// Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Validate input
-if (!isset($data['name'], $data['email'], $data['password'], $data['role'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
-    exit();
+$required = ['name', 'email', 'password', 'role'];
+foreach ($required as $field) {
+    if (!isset($data[$field]) || empty(trim($data[$field]))) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => ucfirst($field) . ' required']);
+        exit();
+    }
 }
 
 $name = trim($data['name']);
 $email = trim($data['email']);
 $password = $data['password'];
-$role = $data['role'];
+$role = strtolower(trim($data['role']));
 $phone = $data['phone'] ?? null;
 
-// Validate role
 $valid_roles = ['customer', 'dealer', 'admin'];
 if (!in_array($role, $valid_roles)) {
+    http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Invalid role']);
     exit();
 }
 
-// Validate email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Invalid email']);
     exit();
 }
 
-// Hash password
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-// Check if email already exists
 $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $stmt->store_result();
 
 if ($stmt->num_rows > 0) {
-    echo json_encode(['status' => 'error', 'message' => 'Email already registered']);
     $stmt->close();
-    $conn->close();
+    http_response_code(409);
+    echo json_encode(['status' => 'error', 'message' => 'Email already exists']);
     exit();
 }
 $stmt->close();
 
-// Insert user
-$stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("sssss", $name, $email, $hashed_password, $role, $phone);
+$conn->begin_transaction();
 
-if ($stmt->execute()) {
+try {
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $name, $email, $hashed_password, $role, $phone);
+    
+    if (!$stmt->execute()) {
+        throw new Exception("User insert failed");
+    }
+    
+    $user_id = $stmt->insert_id;
+    $stmt->close();
+
+    switch ($role) {
+        case 'customer':
+            $stmt = $conn->prepare("INSERT INTO customer_profile (user_id) VALUES (?)");
+            $stmt->bind_param("i", $user_id);
+            break;
+
+        case 'dealer':
+            $shop_name = $data['shop_name'] ?? $name . "'s Shop";
+            $gst_number = $data['gst_number'] ?? null;
+            $stmt = $conn->prepare("INSERT INTO dealer_profile (user_id, shop_name, gst_number) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $user_id, $shop_name, $gst_number);
+            break;
+
+        case 'admin':
+            $access_level = $data['access_level'] ?? 'moderator';
+            $stmt = $conn->prepare("INSERT INTO admin_profile (user_id, access_level) VALUES (?, ?)");
+            $stmt->bind_param("is", $user_id, $access_level);
+            break;
+    }
+
+    if (!$stmt->execute()) {
+        throw new Exception("Profile insert failed");
+    }
+    $stmt->close();
+
+    $conn->commit();
+
     echo json_encode([
         'status' => 'success',
-        'message' => 'Registration successful! Welcome to Trendify.'
+        'message' => 'Registration successful! Welcome to Trendify.',
+        'user' => [
+            'id' => $user_id,
+            'name' => $name,
+            'role' => $role
+        ]
     ]);
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $stmt->error]);
+
+} catch (Exception $e) {
+    $conn->rollback();
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Registration failed']);
 }
 
-$stmt->close();
 $conn->close();
 ?>
