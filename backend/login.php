@@ -7,23 +7,19 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Start session
-session_start();
-
 // Include config
 include 'config.php';
 
-// Check if POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['status' => 'error', 'message' => 'Only POST method allowed']);
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Only POST allowed']);
     exit();
 }
 
-// Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Validate input
 if (!isset($data['email'], $data['password'])) {
+    http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Email and password required']);
     exit();
 }
@@ -33,17 +29,19 @@ $password = $data['password'];
 
 // Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Invalid email format']);
     exit();
 }
 
-// Prepare statement to fetch user
+// Prepare statement
 $stmt = $conn->prepare("SELECT id, name, email, password, role, is_active FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
+    http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Invalid email or password']);
     $stmt->close();
     $conn->close();
@@ -55,6 +53,7 @@ $stmt->close();
 
 // Check if user is active
 if (!$user['is_active']) {
+    http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'Account is disabled']);
     $conn->close();
     exit();
@@ -62,18 +61,19 @@ if (!$user['is_active']) {
 
 // Verify password
 if (!password_verify($password, $user['password'])) {
+    http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Invalid email or password']);
     $conn->close();
     exit();
 }
 
 // Login successful → Set session
+session_regenerate_id(true);
 $_SESSION['user_id'] = $user['id'];
 $_SESSION['name'] = $user['name'];
 $_SESSION['email'] = $user['email'];
 $_SESSION['role'] = $user['role'];
 
-// Return success with role
 echo json_encode([
     'status' => 'success',
     'message' => 'Login successful!',

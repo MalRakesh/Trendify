@@ -1,13 +1,11 @@
 <?php
-// backend/register.php - Advanced Registration
+// backend/register.php - Advanced Registration with Name & Email in Profiles
 
-// Allow CORS
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Include config
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -48,6 +46,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+// Check if email exists
 $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -56,7 +55,7 @@ $stmt->store_result();
 if ($stmt->num_rows > 0) {
     $stmt->close();
     http_response_code(409);
-    echo json_encode(['status' => 'error', 'message' => 'Email already exists']);
+    echo json_encode(['status' => 'error', 'message' => 'Email already registered']);
     exit();
 }
 $stmt->close();
@@ -64,6 +63,7 @@ $stmt->close();
 $conn->begin_transaction();
 
 try {
+    // Insert into users
     $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $name, $email, $hashed_password, $role, $phone);
     
@@ -74,23 +74,26 @@ try {
     $user_id = $stmt->insert_id;
     $stmt->close();
 
+    // Insert into role-specific profile with name & email
     switch ($role) {
         case 'customer':
-            $stmt = $conn->prepare("INSERT INTO customer_profile (user_id) VALUES (?)");
-            $stmt->bind_param("i", $user_id);
+            $stmt = $conn->prepare("INSERT INTO customer_profile (user_id, name, email) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $user_id, $name, $email);
             break;
 
         case 'dealer':
             $shop_name = $data['shop_name'] ?? $name . "'s Shop";
             $gst_number = $data['gst_number'] ?? null;
-            $stmt = $conn->prepare("INSERT INTO dealer_profile (user_id, shop_name, gst_number) VALUES (?, ?, ?)");
-            $stmt->bind_param("iss", $user_id, $shop_name, $gst_number);
+            
+            $stmt = $conn->prepare("INSERT INTO dealer_profile (user_id, name, email, shop_name, gst_number) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("issss", $user_id, $name, $email, $shop_name, $gst_number);
             break;
 
         case 'admin':
             $access_level = $data['access_level'] ?? 'moderator';
-            $stmt = $conn->prepare("INSERT INTO admin_profile (user_id, access_level) VALUES (?, ?)");
-            $stmt->bind_param("is", $user_id, $access_level);
+            
+            $stmt = $conn->prepare("INSERT INTO admin_profile (user_id, name, email, access_level) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $user_id, $name, $email, $access_level);
             break;
     }
 
@@ -107,6 +110,7 @@ try {
         'user' => [
             'id' => $user_id,
             'name' => $name,
+            'email' => $email,
             'role' => $role
         ]
     ]);

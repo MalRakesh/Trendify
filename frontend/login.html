@@ -283,7 +283,7 @@
         messageDiv.innerHTML = '<div class="alert alert-success">Logging in...</div>';
 
         try {
-            const response = await fetch('backend/login.php', {
+            const response = await fetch('http://localhost/trendify/backend/login.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -311,7 +311,7 @@
             }
         } catch (error) {
             messageDiv.innerHTML = `<div class="alert alert-error">Network error. Check if backend is running.</div>`;
-            console.error("Error:", error);
+            console.error("Fetch Error:", error);
         }
     });
     </script>
