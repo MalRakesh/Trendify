@@ -10,15 +10,18 @@ header("Access-Control-Allow-Headers: Content-Type");
 // Include config
 include 'config.php';
 
+// Only POST allowed
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['status' => 'error', 'message' => 'Only POST allowed']);
+    echo json_encode(['status' => 'error', 'message' => 'Only POST method allowed']);
     exit();
 }
 
+// Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (!isset($data['email'], $data['password'])) {
+// Validate input
+if (!isset($data['email']) || !isset($data['password'])) {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Email and password required']);
     exit();
@@ -34,7 +37,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-// Prepare statement
+// Prepare statement to fetch user
 $stmt = $conn->prepare("SELECT id, name, email, password, role, is_active FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
