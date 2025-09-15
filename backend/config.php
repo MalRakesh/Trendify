@@ -1,15 +1,11 @@
 <?php
-// backend/config.php - Fixed Version
-
-// Error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// backend/config.php
 
 // Start session
 session_start();
 
 // Include DB connection
-include 'db.php'; // ✅ Now it's working
+include 'db.php'; // ✅ Ab db.php se connection milega
 
 // Utility Functions
 function showError($message) {
