@@ -272,48 +272,49 @@
     <script src="js/data.js"></script>
     <script src="js/script.js"></script>
     <script>
-    // Handle form submission
-    document.getElementById('login-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const messageDiv = document.getElementById('message');
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        // Handle form submission
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const messageDiv = document.getElementById('message');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-        // Show loading
-        messageDiv.innerHTML = '<div class="alert alert-success">Logging in...</div>';
+            // Show loading
+            messageDiv.innerHTML = '<div class="alert alert-success">Logging in...</div>';
 
-        try {
-            const response = await fetch('http://localhost/trendify/backend/login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
+            try {
+                // Relative path: works on localhost & future host
+                const response = await fetch('../backend/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-            const result = await response.json();
+                const result = await response.json();
 
-            if (result.status === 'success') {
-                messageDiv.innerHTML = `<div class="alert alert-success">${result.message} Redirecting...</div>`;
+                if (result.status === 'success') {
+                    messageDiv.innerHTML = `<div class="alert alert-success">${result.message} Redirecting...</div>`;
 
-                // Role-based redirect
-                setTimeout(() => {
-                    if (result.user.role === 'admin') {
-                        window.location.href = '../admin/dashboard.html';
-                    } else if (result.user.role === 'dealer') {
-                        window.location.href = '../dealer/dashboard.html';
-                    } else {
-                        window.location.href = '../frontend/index.html';
-                    }
-                }, 1500);
-            } else {
-                messageDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                    // Role-based redirect
+                    setTimeout(() => {
+                        if (result.user.role === 'admin') {
+                            window.location.href = '../admin/dashboard.html';
+                        } else if (result.user.role === 'dealer') {
+                            window.location.href = '../dealer/dashboard.html';
+                        } else {
+                            window.location.href = '../index.html';
+                        }
+                    }, 1500);
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">Network error. Backend not reachable.</div>`;
+                console.error("Fetch Error:", error);
             }
-        } catch (error) {
-            messageDiv.innerHTML = `<div class="alert alert-error">Network error. Check if backend is running.</div>`;
-            console.error("Fetch Error:", error);
-        }
-    });
+        });
     </script>
 </body>
 
