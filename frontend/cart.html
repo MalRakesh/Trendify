@@ -53,6 +53,7 @@
 
 <body>
     <!-- Header -->
+    <!-- Header -->
     <header>
         <div class="container">
             <div class="navbar">
@@ -64,8 +65,51 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="products.html">Shop</a></li>
                         <li><a href="cart.html">Cart</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <!-- Dynamic Links -->
+                        <div id="auth-links">
+                            <!-- JS will populate -->
+                            <script>
+                                // Check login status on page load
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    fetch('../backend/check-auth.php')
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            const authDiv = document.getElementById('auth-links');
+                                            if (data.status === 'success') {
+                                                authDiv.innerHTML = `
+                                                    <li class="dropdown">
+                                                        <a href="#">Hello, ${data.user.name}</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="profile.html">My Profile</a></li>
+                                                            <li><a href="${getDashboardLink(data.user.role)}">${data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)} Dashboard</a></li>
+                                                            <li><a href="../backend/logout.php">Logout</a></li>
+                                                        </ul>
+                                                    </li>
+                                                `;
+                                            } else {
+                                                authDiv.innerHTML = `
+                                                    <li><a href="login.html">Login</a></li>
+                                                    <li><a href="register.html">Register</a></li>
+                                                `;
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error("Auth check failed", err);
+                                            document.getElementById('auth-links').innerHTML = `
+                                                <li><a href="login.html">Login</a></li>
+                                                <li><a href="register.html">Register</a></li>
+                                            `;
+                                        });
+                                });
+
+                                // Role-based dashboard link
+                                function getDashboardLink(role) {
+                                    if (role === 'admin') return '../admin/dashboard.html';
+                                    if (role === 'dealer') return '../dealer/dashboard.html';
+                                    return 'profile.html';
+                                }
+                            </script>
+                        </div>
                     </ul>
                 </nav>
             </div>
