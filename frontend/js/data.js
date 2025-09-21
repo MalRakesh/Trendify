@@ -153,7 +153,7 @@ const TrendifyData = {
       name: "Smart Watch",
       price: 2499,
       category: "electronics",
-      image: "assets/product-accessory-3.jpg",
+      image: "../assets/product-accessory-3.jpg",
       description: "Fitness tracker with heart rate monitor.",
       stock: 25,
       featured: true,
