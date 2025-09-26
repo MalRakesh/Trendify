@@ -48,11 +48,64 @@
             padding-top: 1rem;
             border-top: 2px solid #eee;
         }
+
+        /* Responsive Table */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background: #f1f1f1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .cart-summary {
+                min-width: auto;
+                width: 100%;
+                text-align: center;
+            }
+
+            .checkout-section {
+                text-align: center;
+            }
+
+            .summary-row {
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Header -->
     <!-- Header -->
     <header>
         <div class="container">
@@ -61,55 +114,8 @@
                     <a href="index.html">Trendify</a>
                 </div>
                 <nav>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="products.html">Shop</a></li>
-                        <li><a href="cart.html">Cart</a></li>
-                        <!-- Dynamic Links -->
-                        <div id="auth-links">
-                            <!-- JS will populate -->
-                            <script>
-                                // Check login status on page load
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    fetch('../backend/check-auth.php')
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            const authDiv = document.getElementById('auth-links');
-                                            if (data.status === 'success') {
-                                                authDiv.innerHTML = `
-                                                    <li class="dropdown">
-                                                        <a href="#">Hello, ${data.user.name}</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a href="profile.html">My Profile</a></li>
-                                                            <li><a href="${getDashboardLink(data.user.role)}">${data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)} Dashboard</a></li>
-                                                            <li><a href="../backend/logout.php">Logout</a></li>
-                                                        </ul>
-                                                    </li>
-                                                `;
-                                            } else {
-                                                authDiv.innerHTML = `
-                                                    <li><a href="login.html">Login</a></li>
-                                                    <li><a href="register.html">Register</a></li>
-                                                `;
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.error("Auth check failed", err);
-                                            document.getElementById('auth-links').innerHTML = `
-                                                <li><a href="login.html">Login</a></li>
-                                                <li><a href="register.html">Register</a></li>
-                                            `;
-                                        });
-                                });
-
-                                // Role-based dashboard link
-                                function getDashboardLink(role) {
-                                    if (role === 'admin') return '../admin/dashboard.html';
-                                    if (role === 'dealer') return '../dealer/dashboard.html';
-                                    return 'profile.html';
-                                }
-                            </script>
-                        </div>
+                    <ul id="auth-links">
+                        <!-- JS will populate Login/Register or Profile -->
                     </ul>
                 </nav>
             </div>
@@ -153,10 +159,51 @@
     <script src="js/data.js"></script>
     <script src="js/script.js"></script>
     <script>
+        // Check login status and update header
         document.addEventListener('DOMContentLoaded', () => {
-            loadCart();
+            fetch('../backend/check-auth.php')
+                .then(res => res.json())
+                .then(data => {
+                    const authDiv = document.getElementById('auth-links');
+                    if (data.status === 'success') {
+                        authDiv.innerHTML = `
+                            <li class="dropdown">
+                                <a href="#">Hello, ${data.user.name}</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="profile.html">My Profile</a></li>
+                                    <li><a href="${getDashboardLink(data.user.role)}">${capitalize(data.user.role)} Dashboard</a></li>
+                                    <li><a href="../backend/logout.php">Logout</a></li>
+                                </ul>
+                            </li>
+                        `;
+                    } else {
+                        authDiv.innerHTML = `
+                            <li><a href="login.html">Login</a></li>
+                            <li><a href="register.html">Register</a></li>
+                        `;
+                    }
+                    // Load cart after auth check
+                    loadCart();
+                })
+                .catch(() => {
+                    document.getElementById('auth-links').innerHTML = `
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    `;
+                    loadCart();
+                });
         });
 
+        function getDashboardLink(role) {
+            return role === 'admin' ? '../admin/dashboard.html' :
+                role === 'dealer' ? '../dealer/dashboard.html' : 'profile.html';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Load cart items
         function loadCart() {
             const cart = getCart();
             const tbody = document.getElementById('cart-items');
@@ -167,7 +214,7 @@
                 tbody.innerHTML = '';
                 messageDiv.innerHTML = `
                     <div class="empty-cart">
-                        <img src="../assets/images/empty-cart.png" alt="Empty Cart">
+                        <img src="../assets/empty-cart.png" alt="Empty Cart">
                         <p>Your cart is empty!</p>
                         <a href="products.html" class="btn">Continue Shopping</a>
                     </div>
@@ -176,8 +223,8 @@
                 return;
             }
 
-            let cartHTML = '';
             let grandTotal = 0;
+            let cartHTML = '';
 
             cart.forEach(item => {
                 const product = TrendifyData.getProduct(item.id);
@@ -202,7 +249,7 @@
                         </td>
                         <td>₹${itemTotal.toLocaleString()}</td>
                         <td>
-                            <button onclick="removeFromCart(${item.id})" class="btn btn-danger" style="padding: 0.4rem 0.8rem;">Remove</button>
+                            <button onclick="removeFromCart(${item.id})" class="btn btn-danger">Remove</button>
                         </td>
                     </tr>
                 `;
@@ -210,23 +257,75 @@
 
             tbody.innerHTML = cartHTML;
 
-            checkoutSection.innerHTML = `
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span>Subtotal:</span>
-                        <span>₹${grandTotal.toLocaleString()}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping:</span>
-                        <span>₹50</span>
-                    </div>
-                    <div class="summary-row summary-total">
-                        <span>Total:</span>
-                        <span>₹${(grandTotal + 50).toLocaleString()}</span>
-                    </div>
-                    <button class="btn btn-primary" onclick="proceedToCheckout()">Proceed to Checkout</button>
-                </div>
-            `;
+            // ✅ Checkout Logic: Only show if logged in
+            fetch('../backend/check-auth.php')
+                .then(res => res.json())
+                .then(data => {
+                    const totalWithShipping = grandTotal + 50;
+
+                    if (data.status === 'success') {
+                        // Logged In → Show Checkout Button
+                        checkoutSection.innerHTML = `
+                            <div class="cart-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span>₹${grandTotal.toLocaleString()}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Shipping:</span>
+                                    <span>₹50</span>
+                                </div>
+                                <div class="summary-row summary-total">
+                                    <span>Total:</span>
+                                    <span>₹${totalWithShipping.toLocaleString()}</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                            </div>
+                        `;
+                    } else {
+                        // Not Logged In → Prompt to Login
+                        checkoutSection.innerHTML = `
+                            <div class="cart-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span>₹${grandTotal.toLocaleString()}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Shipping:</span>
+                                    <span>₹50</span>
+                                </div>
+                                <div class="summary-row summary-total">
+                                    <span>Total:</span>
+                                    <span>₹${totalWithShipping.toLocaleString()}</span>
+                                </div>
+                                <p style="color: #e74c3c; font-weight: 500;">You need to login to complete the purchase.</p>
+                                <a href="login.html" class="btn btn-primary">Login to Checkout</a>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(() => {
+                    // Network error → Assume not logged in
+                    const totalWithShipping = grandTotal + 50;
+                    checkoutSection.innerHTML = `
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span>₹${grandTotal.toLocaleString()}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Shipping:</span>
+                                <span>₹50</span>
+                            </div>
+                            <div class="summary-row summary-total">
+                                <span>Total:</span>
+                                <span>₹${totalWithShipping.toLocaleString()}</span>
+                            </div>
+                            <p style="color: #e74c3c; font-weight: 500;">Please login to proceed.</p>
+                            <a href="login.html" class="btn btn-primary">Login to Checkout</a>
+                        </div>
+                    `;
+                });
 
             messageDiv.innerHTML = '';
         }
@@ -237,8 +336,24 @@
                 alert("Your cart is empty!");
                 return;
             }
-            alert("Redirecting to secure checkout...");
-            // In real app: redirect to payment gateway
+
+            // Double-check login before proceeding
+            fetch('../backend/check-auth.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert("Redirecting to secure checkout...");
+                        // In real app: redirect to payment gateway
+                        window.location.href = "checkout.html";
+                    } else {
+                        alert("Please login to complete your order.");
+                        window.location.href = "login.html";
+                    }
+                })
+                .catch(() => {
+                    alert("Authentication error. Please login.");
+                    window.location.href = "login.html";
+                });
         }
     </script>
 </body>
