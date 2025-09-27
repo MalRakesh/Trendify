@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Trendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 3rem;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #27ae60;
+            margin-bottom: 1rem;
+        }
+
+        .order-number {
+            font-size: 1.4rem;
+            color: #e74c3c;
+            margin: 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .order-details {
+            margin: 2rem 0;
+            text-align: left;
+            color: #555;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.7rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .items-list {
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .item-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .item-qty-price {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .actions {
+            margin: 3rem 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: #333;
+            color: #555;
+        }
+
+        .note {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            text-align: left;
+            font-style: italic;
+            color: #555;
+        }
+
+        @media (max-width: 480px) {
+            .confirmation-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html">Trendify</a>
+                </div>
+                <nav>
+                    <ul id="auth-links">
+                        <!-- JS will populate Login/Register or Profile -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="confirmation-container">
+        <div class="success-icon">✅</div>
+        <h1>Thank You for Your Order!</h1>
+        <p>Your order has been confirmed and is being processed.</p>
+
+        <div class="order-number">Order #<span id="order-id">LOADING...</span></div>
+
+        <!-- Order Summary -->
+        <div class="order-details">
+            <div class="detail-row">
+                <span class="detail-label">Date:</span>
+                <span id="order-date">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total Amount:</span>
+                <span id="order-total">₹0</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Method:</span>
+                <span id="payment-method">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span style="color: #27ae60; font-weight: 600;">Confirmed</span>
+            </div>
+        </div>
+
+        <!-- Items List -->
+        <div class="items-list">
+            <h3>Items in Your Order</h3>
+            <div id="order-items">
+                <!-- JS will populate -->
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> You will receive an email confirmation shortly with tracking details.
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="index.html" class="btn btn-outline">Continue Shopping</a>
+            <a href="my-orders.html" class="btn btn-primary">View My Orders</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Check login status
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('../backend/check-auth.php')
+                .then(res => res.json())
+                .then(data => {
+                    const authDiv = document.getElementById('auth-links');
+                    if (data.status === 'success') {
+                        authDiv.innerHTML = `
+                            <li class="dropdown">
+                                <a href="#">Hello, ${data.user.name}</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="profile.html">My Profile</a></li>
+                                    <li><a href="${getDashboardLink(data.user.role)}">${capitalize(data.user.role)} Dashboard</a></li>
+                                    <li><a href="../backend/logout.php">Logout</a></li>
+                                </ul>
+                            </li>
+                        `;
+                        loadOrderDetails();
+                    } else {
+                        // Guest user: still show order
+                        loadOrderDetails();
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('auth-links').innerHTML = `
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    `;
+                    loadOrderDetails();
+                });
+        });
+
+        function getDashboardLink(role) {
+            return role === 'admin' ? '../admin/dashboard.html' :
+                role === 'dealer' ? '../dealer/dashboard.html' : 'profile.html';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Load order details from URL & localStorage
+        function loadOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order') || 'ORD-XXXXXX';
+
+            document.getElementById('order-id').textContent = orderNumber;
+
+            // Mock data (in real app: fetch from backend)
+            const mockOrder = {
+                date: new Date().toLocaleDateString(),
+                total: 2549,
+                paymentMethod: 'Cash on Delivery',
+                items: [
+                    { id: 1, name: "Slim Fit Casual Shirt", price: 899, qty: 1, image: "../assets/product-men-1.jpg" },
+                    { id: 5, name: "Leather Wallet", price: 599, qty: 1, image: "../assets/product-accessory-3.jpg" },
+                    { id: 6, name: "Sports Running Shoes", price: 1051, qty: 1, image: "../assets/product-footwear-2.jpg" }
+                ]
+            };
+
+            document.getElementById('order-date').textContent = mockOrder.date;
+            document.getElementById('order-total').textContent = `₹${mockOrder.total.toLocaleString()}`;
+            document.getElementById('payment-method').textContent = mockOrder.paymentMethod;
+
+            const itemsContainer = document.getElementById('order-items');
+            let itemsHTML = '';
+
+            mockOrder.items.forEach(item => {
+                itemsHTML += `
+                    <div class="item-row">
+                        <img src="${item.image}" alt="${item.name}" class="item-img">
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-qty-price">Qty: ${item.qty} × ₹${item.price.toLocaleString()}</div>
+                        </div>
+                        <div class="item-total">₹${(item.price * item.qty).toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            itemsContainer.innerHTML = itemsHTML;
+        }
+    </script>
+</body>
+
+</html>
