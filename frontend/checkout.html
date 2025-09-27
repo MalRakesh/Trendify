@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Trendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .checkout-container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-total {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ddd;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .place-order-btn:hover {
+            background: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .back-to-cart {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-to-cart:hover {
+            text-decoration: underline;
+        }
+
+        .cart-item-small {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .cart-item-small img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .cart-item-price {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html">Trendify</a>
+                </div>
+                <nav>
+                    <ul id="auth-links">
+                        <!-- JS will populate Login/Register or Profile -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="checkout-container">
+        <a href="cart.html" class="back-to-cart">← Back to Cart</a>
+        <h2>Checkout</h2>
+
+        <!-- Messages -->
+        <div id="message"></div>
+
+        <div class="checkout-grid">
+            <!-- Shipping Form -->
+            <div class="shipping-form">
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="full-name">Full Name</label>
+                        <input type="text" id="full-name" class="form-control" placeholder="Enter your full name"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" class="form-control" placeholder="House number and street name"
+                            required>
+                    </div>
+
+                    <div class="form-row" style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="city">City</label>
+                            <input type="text" id="city" class="form-control" placeholder="City" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="state">State</label>
+                            <input type="text" id="state" class="form-control" placeholder="State" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" class="form-control" placeholder="Postal Code" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment-method">Payment Method</label>
+                        <select id="payment-method" class="form-control" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="cod">Cash on Delivery (COD)</option>
+                            <option value="online">Online Payment (UPI/Card)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="place-order-btn">Place Order</button>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h3>Your Order</h3>
+                <div id="order-items">
+                    <!-- JS will populate cart items -->
+                </div>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span>₹50</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total:</span>
+                    <span id="total">₹0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 <strong>Trendify</strong>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Check login status
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('../backend/check-auth.php')
+                .then(res => res.json())
+                .then(data => {
+                    const authDiv = document.getElementById('auth-links');
+                    if (data.status === 'success') {
+                        authDiv.innerHTML = `
+                            <li class="dropdown">
+                                <a href="#">Hello, ${data.user.name}</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="profile.html">My Profile</a></li>
+                                    <li><a href="${getDashboardLink(data.user.role)}">${capitalize(data.user.role)} Dashboard</a></li>
+                                    <li><a href="../backend/logout.php">Logout</a></li>
+                                </ul>
+                            </li>
+                        `;
+                        loadCartSummary();
+                    } else {
+                        alert("Please login to checkout.");
+                        window.location.href = "login.html";
+                    }
+                })
+                .catch(() => {
+                    window.location.href = "login.html";
+                });
+        });
+
+        function getDashboardLink(role) {
+            return role === 'admin' ? '../admin/dashboard.html' :
+                role === 'dealer' ? '../dealer/dashboard.html' : 'profile.html';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Load cart into checkout
+        function loadCartSummary() {
+            const cart = getCart();
+            const orderItemsContainer = document.getElementById('order-items');
+            const subtotalEl = document.getElementById('subtotal');
+            const totalEl = document.getElementById('total');
+
+            if (cart.length === 0) {
+                document.getElementById('message').innerHTML = `
+                    <div class="alert alert-error">Your cart is empty!</div>
+                `;
+                setTimeout(() => {
+                    window.location.href = "products.html";
+                }, 1500);
+                return;
+            }
+
+            let subtotal = 0;
+            let cartHTML = '';
+
+            cart.forEach(item => {
+                const product = TrendifyData.getProduct(item.id);
+                if (!product) return;
+
+                const itemTotal = product.price * item.qty;
+                subtotal += itemTotal;
+
+                cartHTML += `
+                    <div class="cart-item-small">
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${product.name}</div>
+                            <div class="cart-item-qty">Qty: ${item.qty}</div>
+                            <div class="cart-item-price">₹${itemTotal.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const total = subtotal + 50;
+
+            orderItemsContainer.innerHTML = cartHTML;
+            subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
+            totalEl.textContent = `₹${total.toLocaleString()}`;
+        }
+
+        // Handle form submission
+        document.getElementById('checkout-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const messageDiv = document.getElementById('message');
+
+            const fullName = document.getElementById('full-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const paymentMethod = document.getElementById('payment-method').value;
+
+            // Validation
+            if (!fullName || !email || !phone || !address || !city || !state || !pincode || !paymentMethod) {
+                messageDiv.innerHTML = '<div class="alert alert-error">Please fill all fields.</div>';
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                messageDiv.innerHTML = '<div class="alert alert-error">Please enter a valid email.</div>';
+                return;
+            }
+
+            // Get cart data
+            const cart = getCart();
+            const subtotal = cart.reduce((sum, item) => {
+                const product = TrendifyData.getProduct(item.id);
+                return sum + (product ? product.price * item.qty : 0);
+            }, 0);
+
+            const totalAmount = subtotal + 50;
+
+            // Prepare order data
+            const orderData = {
+                user_name: fullName,
+                email: email,
+                phone: phone,
+                shipping_address: `${address}, ${city}, ${state} - ${pincode}`,
+                total_amount: totalAmount,
+                payment_method: paymentMethod,
+                payment_status: paymentMethod === 'cod' ? 'pending' : 'paid',
+                status: 'pending',
+                items: cart.map(item => ({
+                    product_id: item.id,
+                    quantity: item.qty,
+                    price_per_unit: TrendifyData.getProduct(item.id)?.price || 0
+                }))
+            };
+
+            // Show loading
+            messageDiv.innerHTML = '<div class="alert alert-success">Placing your order...</div>';
+            document.querySelector('.place-order-btn').disabled = true;
+
+            try {
+                const response = await fetch('../backend/place-order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    messageDiv.innerHTML = `<div class="alert alert-success">${result.message} Redirecting to order confirmation...</div>`;
+
+                    // Clear cart
+                    localStorage.removeItem('trendify_cart');
+                    updateCartBadge();
+
+                    setTimeout(() => {
+                        window.location.href = 'order-confirmation.html?order=' + result.order_number;
+                    }, 1500);
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                    document.querySelector('.place-order-btn').disabled = false;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">Network error. Please try again.</div>`;
+                console.error("Error:", error);
+                document.querySelector('.place-order-btn').disabled = false;
+            }
+        });
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
+</body>
+
+</html>
