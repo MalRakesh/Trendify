@@ -272,7 +272,6 @@
         </div>
     </footer>
 
-    <script src="js/data.js"></script>
     <script src="js/script.js"></script>
     <script>
         // Check login status
@@ -292,7 +291,7 @@
                                 </ul>
                             </li>
                         `;
-                        loadCartSummary();
+                        loadCartFromDB(); // ✅ Load from DB only
                     } else {
                         alert("Please login to checkout.");
                         window.location.href = "login.html";
@@ -312,50 +311,60 @@
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
-        // Load cart into checkout
-        function loadCartSummary() {
-            const cart = getCart();
+        // ✅ Load cart from backend (DB)
+        async function loadCartFromDB() {
             const orderItemsContainer = document.getElementById('order-items');
             const subtotalEl = document.getElementById('subtotal');
             const totalEl = document.getElementById('total');
+            const messageDiv = document.getElementById('message');
 
-            if (cart.length === 0) {
-                document.getElementById('message').innerHTML = `
-                    <div class="alert alert-error">Your cart is empty!</div>
-                `;
-                setTimeout(() => {
-                    window.location.href = "products.html";
-                }, 1500);
-                return;
-            }
+            try {
+                const response = await fetch('../backend/cart-handler.php');
+                const result = await response.json();
 
-            let subtotal = 0;
-            let cartHTML = '';
+                if (result.status !== 'success') {
+                    throw new Error(result.message);
+                }
 
-            cart.forEach(item => {
-                const product = TrendifyData.getProduct(item.id);
-                if (!product) return;
+                const cart = result.cart;
 
-                const itemTotal = product.price * item.qty;
-                subtotal += itemTotal;
+                if (cart.length === 0) {
+                    messageDiv.innerHTML = '<div class="alert alert-error">Your cart is empty!</div>';
+                    setTimeout(() => {
+                        window.location.href = "products.html";
+                    }, 1500);
+                    return;
+                }
 
-                cartHTML += `
-                    <div class="cart-item-small">
-                        <img src="${product.image}" alt="${product.name}">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${product.name}</div>
-                            <div class="cart-item-qty">Qty: ${item.qty}</div>
-                            <div class="cart-item-price">₹${itemTotal.toLocaleString()}</div>
+                let subtotal = 0;
+                let cartHTML = '';
+
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.qty;
+                    subtotal += itemTotal;
+
+                    cartHTML += `
+                        <div class="cart-item-small">
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-qty">Qty: ${item.qty}</div>
+                                <div class="cart-item-price">₹${itemTotal.toLocaleString()}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
 
-            const total = subtotal + 50;
+                const totalAmount = subtotal + 50;
 
-            orderItemsContainer.innerHTML = cartHTML;
-            subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
-            totalEl.textContent = `₹${total.toLocaleString()}`;
+                orderItemsContainer.innerHTML = cartHTML;
+                subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
+                totalEl.textContent = `₹${totalAmount.toLocaleString()}`;
+
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">Error loading cart: ${error.message}</div>`;
+                console.error("Cart Fetch Error:", error);
+            }
         }
 
         // Handle form submission
@@ -383,16 +392,29 @@
                 return;
             }
 
-            // Get cart data
-            const cart = getCart();
-            const subtotal = cart.reduce((sum, item) => {
-                const product = TrendifyData.getProduct(item.id);
-                return sum + (product ? product.price * item.qty : 0);
-            }, 0);
+            // ✅ Fetch cart from DB before placing order
+            let cart, subtotal = 0;
+
+            try {
+                const res = await fetch('../backend/cart-handler.php');
+                const result = await res.json();
+
+                if (result.status !== 'success' || result.cart.length === 0) {
+                    messageDiv.innerHTML = '<div class="alert alert-error">Cart is empty or invalid.</div>';
+                    setTimeout(() => window.location.href = "cart.html", 1500);
+                    return;
+                }
+
+                cart = result.cart;
+                subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            } catch (err) {
+                messageDiv.innerHTML = '<div class="alert alert-error">Failed to verify cart.</div>';
+                console.error(err);
+                return;
+            }
 
             const totalAmount = subtotal + 50;
 
-            // Prepare order data
             const orderData = {
                 user_name: fullName,
                 email: email,
@@ -405,7 +427,7 @@
                 items: cart.map(item => ({
                     product_id: item.id,
                     quantity: item.qty,
-                    price_per_unit: TrendifyData.getProduct(item.id)?.price || 0
+                    price_per_unit: item.price
                 }))
             };
 
@@ -423,9 +445,21 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    messageDiv.innerHTML = `<div class="alert alert-success">${result.message} Redirecting to order confirmation...</div>`;
+                    // ✅ Clear cart from DB
+                    await fetch('../backend/cart-handler.php', {
+                        method: 'DELETE'
+                    });
 
-                    // Clear cart
+                    // ✅ Big success prompt
+                    messageDiv.innerHTML = `
+                        <div class="alert alert-success" style="text-align:center; font-size:1.2rem;">
+                            🎉 Order placed successfully!<br>
+                            <strong>Order #${result.order_number}</strong><br>
+                            Redirecting to confirmation...
+                        </div>
+                    `;
+
+                    // Clear local badge
                     localStorage.removeItem('trendify_cart');
                     updateCartBadge();
 
