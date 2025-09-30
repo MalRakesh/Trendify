@@ -6,11 +6,12 @@
  * CART MANAGEMENT
  */
 
-// script.js - Shared Functions for Trendify Frontend
+// script.js - Main Application Logic for Trendify
 
 // Get cart from localStorage
 function getCart() {
-    return JSON.parse(localStorage.getItem("trendify_cart")) || [];
+    const cart = localStorage.getItem("trendify_cart");
+    return cart ? JSON.parse(cart) : [];
 }
 
 // Save cart to localStorage
@@ -18,28 +19,29 @@ function saveCart(cart) {
     localStorage.setItem("trendify_cart", JSON.stringify(cart));
 }
 
-// Update cart badge (e.g. Cart (8)) - Shows total quantity of all items
+// Update cart badge to show COUNT OF UNIQUE PRODUCTS (e.g. Cart (3))
 function updateCartBadge() {
     const cart = getCart();
-    // ✅ Total quantity = sum of all item quantities
-    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    
+    // ✅ Number of unique products (not total quantity)
+    const uniqueProductCount = cart.length;
 
-    // Select ALL cart links (header, footer, nav)
+    // Select all cart links in nav (support relative paths)
     const cartLinks = document.querySelectorAll('a[href="cart.html"], a[href="./cart.html"], a[href="../cart.html"]');
 
     cartLinks.forEach(link => {
-        // Remove old badge like (3)
+        // Remove old badge like (5)
         const text = link.textContent.replace(/ \(.*\)/, '').trim();
-        // Set new badge with total quantity
-        link.textContent = `${text} (${totalItems})`;
+        // Set new badge with unique product count
+        link.textContent = `${text} (${uniqueProductCount})`;
     });
 }
 
-// Add to cart
+// Add product to cart
 function addToCart(productId) {
     const cart = getCart();
     const existing = cart.find(item => item.id === productId);
-    
+
     if (existing) {
         existing.qty += 1;
     } else {
@@ -51,12 +53,13 @@ function addToCart(productId) {
     showToast("Item added to cart!");
 }
 
-// Add to cart from product detail (with quantity selector)
+// Add to cart from product detail page
 function addToCartFromDetail(productId) {
-    const qty = parseInt(document.getElementById("quantity").textContent);
+    const qtyInput = document.getElementById("quantity");
+    const qty = qtyInput ? parseInt(qtyInput.textContent) || 1 : 1;
     const cart = getCart();
     const existing = cart.find(item => item.id === productId);
-    
+
     if (existing) {
         existing.qty += qty;
     } else {
