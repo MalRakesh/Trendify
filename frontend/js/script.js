@@ -6,104 +6,130 @@
  * CART MANAGEMENT
  */
 
+// script.js - Shared Functions for Trendify Frontend
+
 // Get cart from localStorage
 function getCart() {
-  const cart = localStorage.getItem("trendify_cart");
-  return cart ? JSON.parse(cart) : [];
+    return JSON.parse(localStorage.getItem("trendify_cart")) || [];
 }
 
 // Save cart to localStorage
 function saveCart(cart) {
-  localStorage.setItem("trendify_cart", JSON.stringify(cart));
+    localStorage.setItem("trendify_cart", JSON.stringify(cart));
 }
 
-// Add product to cart
+// Update cart badge (e.g. Cart (8)) - Shows total quantity of all items
+function updateCartBadge() {
+    const cart = getCart();
+    // ✅ Total quantity = sum of all item quantities
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+    // Select ALL cart links (header, footer, nav)
+    const cartLinks = document.querySelectorAll('a[href="cart.html"], a[href="./cart.html"], a[href="../cart.html"]');
+
+    cartLinks.forEach(link => {
+        // Remove old badge like (3)
+        const text = link.textContent.replace(/ \(.*\)/, '').trim();
+        // Set new badge with total quantity
+        link.textContent = `${text} (${totalItems})`;
+    });
+}
+
+// Add to cart
 function addToCart(productId) {
-  const cart = getCart();
-  const existing = cart.find((item) => item.id === productId);
+    const cart = getCart();
+    const existing = cart.find(item => item.id === productId);
+    
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ id: productId, qty: 1 });
+    }
 
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ id: productId, qty: 1 });
-  }
-
-  saveCart(cart);
-  updateCartBadge();
-  showToast(`Product added to cart!`);
+    saveCart(cart);
+    updateCartBadge(); // ✅ Update badge
+    showToast("Item added to cart!");
 }
 
-// Add to cart from product detail
+// Add to cart from product detail (with quantity selector)
 function addToCartFromDetail(productId) {
-  const qty = parseInt(document.getElementById("quantity").textContent);
-  const cart = getCart();
-  const existing = cart.find((item) => item.id === productId);
+    const qty = parseInt(document.getElementById("quantity").textContent);
+    const cart = getCart();
+    const existing = cart.find(item => item.id === productId);
+    
+    if (existing) {
+        existing.qty += qty;
+    } else {
+        cart.push({ id: productId, qty: qty });
+    }
 
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({ id: productId, qty: qty });
-  }
-
-  saveCart(cart);
-  updateCartBadge();
-  showToast(`${qty} item(s) added to cart!`);
+    saveCart(cart);
+    updateCartBadge();
+    showToast(`${qty} item(s) added to cart!`);
 }
 
 // Update quantity
 function updateQty(productId, newQty) {
-  if (newQty < 1) return;
-
-  const cart = getCart();
-  const item = cart.find((item) => item.id === productId);
-
-  if (item) {
-    item.qty = newQty;
-    saveCart(cart);
-    if (typeof loadCart === "function") {
-      loadCart();
+    if (newQty < 1) return;
+    const cart = getCart();
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        item.qty = newQty;
+        saveCart(cart);
+        if (typeof loadCart === "function") {
+            loadCart(); // Refresh cart UI
+        }
+        updateCartBadge();
     }
-    updateCartBadge();
-  }
 }
 
 // Remove item from cart
 function removeFromCart(productId) {
-  const cart = getCart().filter((item) => item.id !== productId);
-  saveCart(cart);
-  if (typeof loadCart === "function") {
-    loadCart();
-  }
-  updateCartBadge();
-  showToast("Item removed from cart.");
+    const cart = getCart().filter(item => item.id !== productId);
+    saveCart(cart);
+    if (typeof loadCart === "function") {
+        loadCart();
+    }
+    updateCartBadge();
+    showToast("Item removed from cart.");
 }
 
 // Clear entire cart
 function clearCart() {
-  localStorage.removeItem("trendify_cart");
-  updateCartBadge();
-  if (typeof loadCart === "function") {
-    loadCart();
-  }
+    localStorage.removeItem("trendify_cart");
+    updateCartBadge();
+    if (typeof loadCart === "function") {
+        loadCart();
+    }
 }
 
-// Update cart badge (e.g. Cart (3))
-function updateCartBadge() {
-  const cart = getCart();
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-
-  const badges = document.querySelectorAll(
-    'a[href="cart.html"], nav a[href="cart.php"]'
-  );
-  badges.forEach((badge) => {
-    const text = badge.textContent.replace(/ \(.*\)/, "");
-    badge.textContent = `${text} (${totalItems})`;
-  });
+// Show toast message
+function showToast(message) {
+    let toast = document.getElementById("toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white; padding: 12px 24px;
+            border-radius: 6px; z-index: 1000; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.opacity = 0;
+        setTimeout(() => toast.style.display = "none", 300);
+        toast.style.opacity = 1;
+    }, 2000);
 }
 
-// Initialize cart badge on page load
+// Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
-  updateCartBadge();
+    updateCartBadge(); // ✅ Always run on every page
 });
 
 /**
