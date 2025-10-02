@@ -136,9 +136,13 @@
     <header>
         <div class="container">
             <div class="navbar">
-                <div class="logo"><a href="index.html">Trendify</a></div>
+                <div class="logo">
+                    <a href="index.html">Trendify</a>
+                </div>
                 <nav>
-                    <ul id="auth-links"><!-- JS will populate --></ul>
+                    <ul id="auth-links">
+                        <!-- JS will populate -->
+                    </ul>
                 </nav>
             </div>
         </div>
@@ -147,30 +151,52 @@
     <div class="checkout-container">
         <a href="cart.html" class="back-to-cart">← Back to Cart</a>
         <h2>Checkout</h2>
+
         <div id="message"></div>
 
         <div class="checkout-grid">
             <!-- Shipping Form -->
             <div class="shipping-form">
                 <form id="checkout-form">
-                    <div class="form-group"><label for="full-name">Full Name</label><input type="text" id="full-name"
-                            class="form-control" placeholder="Enter your full name" required></div>
-                    <div class="form-group"><label for="email">Email Address</label><input type="email" id="email"
-                            class="form-control" placeholder="Enter your email" required></div>
-                    <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone"
-                            class="form-control" placeholder="Enter your phone number" required></div>
-                    <div class="form-group"><label for="address">Street Address</label><input type="text" id="address"
-                            class="form-control" placeholder="House number and street name" required></div>
-
-                    <div style="display:flex;gap:1rem;">
-                        <div class="form-group" style="flex:1;"><label for="city">City</label><input type="text"
-                                id="city" class="form-control" placeholder="City" required></div>
-                        <div class="form-group" style="flex:1;"><label for="state">State</label><input type="text"
-                                id="state" class="form-control" placeholder="State" required></div>
+                    <div class="form-group">
+                        <label for="full-name">Full Name</label>
+                        <input type="text" id="full-name" class="form-control" placeholder="Enter your full name"
+                            required>
                     </div>
 
-                    <div class="form-group"><label for="pincode">Pincode</label><input type="text" id="pincode"
-                            class="form-control" placeholder="Postal Code" required></div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" class="form-control" placeholder="House number and street name"
+                            required>
+                    </div>
+
+                    <div class="form-row" style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="city">City</label>
+                            <input type="text" id="city" class="form-control" placeholder="City" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="state">State</label>
+                            <input type="text" id="state" class="form-control" placeholder="State" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" class="form-control" placeholder="Postal Code" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="payment-method">Payment Method</label>
                         <select id="payment-method" class="form-control" required>
@@ -179,6 +205,7 @@
                             <option value="online">Online Payment</option>
                         </select>
                     </div>
+
                     <button type="submit" class="place-order-btn">Place Order</button>
                 </form>
             </div>
@@ -186,10 +213,21 @@
             <!-- Order Summary -->
             <div class="order-summary">
                 <h3>Your Order</h3>
-                <div id="order-items"></div>
-                <div class="summary-row"><span>Subtotal:</span><span id="subtotal">₹0</span></div>
-                <div class="summary-row"><span>Shipping:</span><span>₹50</span></div>
-                <div class="summary-row summary-total"><span>Total:</span><span id="total">₹0</span></div>
+                <div id="order-items">
+                    <!-- JS will populate -->
+                </div>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span>₹50</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total:</span>
+                    <span id="total">₹0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -201,10 +239,11 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- Scripts - MUST BE IN THIS ORDER -->
     <script src="js/data.js"></script>
     <script src="js/script.js"></script>
     <script>
+        // Check login status
         document.addEventListener('DOMContentLoaded', () => {
             fetch('../backend/check-auth.php')
                 .then(res => res.json())
@@ -221,9 +260,9 @@
                                 </ul>
                             </li>
                         `;
-                        loadCart();
+                        loadCart(); // Load cart after login check
                     } else {
-                        alert("Login required");
+                        alert("Please login to checkout.");
                         window.location.href = "login.html";
                     }
                 })
@@ -241,13 +280,22 @@
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
+        // Load cart from localStorage
         function loadCart() {
             const cart = getCart();
+            const orderItemsContainer = document.getElementById('order-items');
+            const subtotalEl = document.getElementById('subtotal');
+            const totalEl = document.getElementById('total');
             const messageDiv = document.getElementById('message');
 
-            if (cart.length === 0) {
+            // Debug: Check if cart exists
+            console.log("Cart:", cart);
+
+            if (!Array.isArray(cart) || cart.length === 0) {
                 messageDiv.innerHTML = '<div class="alert alert-error">Your cart is empty!</div>';
-                setTimeout(() => window.location.href = "products.html", 1500);
+                setTimeout(() => {
+                    window.location.href = "products.html";
+                }, 1500);
                 return;
             }
 
@@ -256,7 +304,10 @@
 
             cart.forEach(item => {
                 const product = TrendifyData.getProduct(item.id);
-                if (!product) return;
+                if (!product) {
+                    console.warn(`Product not found for ID: ${item.id}`);
+                    return;
+                }
 
                 const itemTotal = product.price * item.qty;
                 subtotal += itemTotal;
@@ -274,11 +325,13 @@
             });
 
             const totalAmount = subtotal + 50;
-            document.getElementById('order-items').innerHTML = cartHTML;
-            document.getElementById('subtotal').textContent = `₹${subtotal.toLocaleString()}`;
-            document.getElementById('total').textContent = `₹${totalAmount.toLocaleString()}`;
+
+            orderItemsContainer.innerHTML = cartHTML;
+            subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
+            totalEl.textContent = `₹${totalAmount.toLocaleString()}`;
         }
 
+        // Handle form submission
         document.getElementById('checkout-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const messageDiv = document.getElementById('message');
@@ -292,18 +345,34 @@
             const pincode = document.getElementById('pincode').value.trim();
             const paymentMethod = document.getElementById('payment-method').value;
 
+            // Validation
             if (!fullName || !email || !phone || !address || !city || !state || !pincode || !paymentMethod) {
                 messageDiv.innerHTML = '<div class="alert alert-error">Please fill all fields.</div>';
                 return;
             }
 
+            // Get cart data
             const cart = getCart();
+            if (!Array.isArray(cart) || cart.length === 0) {
+                messageDiv.innerHTML = '<div class="alert alert-error">Cart is empty or invalid.</div>';
+                setTimeout(() => window.location.href = "cart.html", 1500);
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => {
+                const product = TrendifyData.getProduct(item.id);
+                return sum + (product ? product.price * item.qty : 0);
+            }, 0);
+
+            const totalAmount = subtotal + 50;
+
+            // Prepare order data
             const orderData = {
                 user_name: fullName,
                 email: email,
                 phone: phone,
                 shipping_address: `${address}, ${city}, ${state} - ${pincode}`,
-                total_amount: cart.reduce((sum, item) => sum + (TrendifyData.getProduct(item.id)?.price || 0) * item.qty, 0) + 50,
+                total_amount: totalAmount,
                 payment_method: paymentMethod,
                 items: cart.map(item => ({
                     product_id: item.id,
@@ -312,8 +381,9 @@
                 }))
             };
 
+            // Show loading
             messageDiv.innerHTML = '<div class="alert alert-success">Placing your order...</div>';
-            this.disabled = true;
+            document.querySelector('.place-order-btn').disabled = true;
 
             try {
                 const response = await fetch('../backend/place-order.php', {
@@ -325,18 +395,28 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
+                    // Clear cart after success
                     localStorage.removeItem('trendify_cart');
                     updateCartBadge();
-                    messageDiv.innerHTML = '<div class="alert alert-success">Order placed! Redirecting...</div>';
-                    setTimeout(() => window.location.href = 'order-confirmation.html?order=' + result.order_number, 1500);
+
+                    messageDiv.innerHTML = `
+                        <div class="alert alert-success" style="text-align:center;">
+                            🎉 Order placed successfully!<br>
+                            Redirecting to confirmation...
+                        </div>
+                    `;
+
+                    setTimeout(() => {
+                        window.location.href = 'order-confirmation.html?order=' + result.order_number;
+                    }, 1500);
                 } else {
                     messageDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
-                    this.disabled = false;
+                    document.querySelector('.place-order-btn').disabled = false;
                 }
             } catch (error) {
-                messageDiv.innerHTML = `<div class="alert alert-error">Network error. Try again.</div>`;
-                console.error(error);
-                this.disabled = false;
+                messageDiv.innerHTML = `<div class="alert alert-error">Network error. Please try again.</div>`;
+                console.error("Error:", error);
+                document.querySelector('.place-order-btn').disabled = false;
             }
         });
     </script>
