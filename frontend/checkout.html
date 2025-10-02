@@ -54,12 +54,6 @@
             font-size: 1rem;
         }
 
-        .form-control:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-
         .order-summary {
             background: #f8f9fa;
             padding: 1.5rem;
@@ -95,12 +89,6 @@
             margin-top: 1.5rem;
         }
 
-        .place-order-btn:hover {
-            background: #219653;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
         .alert {
             padding: 1rem;
             margin-bottom: 1.5rem;
@@ -121,15 +109,8 @@
         }
 
         .back-to-cart {
-            display: inline-block;
-            margin-bottom: 1.5rem;
             color: #3498db;
             text-decoration: none;
-            font-weight: 500;
-        }
-
-        .back-to-cart:hover {
-            text-decoration: underline;
         }
 
         .cart-item-small {
@@ -146,20 +127,6 @@
             object-fit: cover;
             border-radius: 6px;
         }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .cart-item-price {
-            color: #e74c3c;
-            font-weight: 600;
-        }
     </style>
 </head>
 
@@ -173,7 +140,7 @@
                 </div>
                 <nav>
                     <ul id="auth-links">
-                        <!-- JS will populate Login/Register or Profile -->
+                        <!-- JS will populate -->
                     </ul>
                 </nav>
             </div>
@@ -184,7 +151,6 @@
         <a href="cart.html" class="back-to-cart">← Back to Cart</a>
         <h2>Checkout</h2>
 
-        <!-- Messages -->
         <div id="message"></div>
 
         <div class="checkout-grid">
@@ -235,7 +201,7 @@
                         <select id="payment-method" class="form-control" required>
                             <option value="">Select Payment Method</option>
                             <option value="cod">Cash on Delivery (COD)</option>
-                            <option value="online">Online Payment (UPI/Card)</option>
+                            <option value="online">Online Payment</option>
                         </select>
                     </div>
 
@@ -247,7 +213,7 @@
             <div class="order-summary">
                 <h3>Your Order</h3>
                 <div id="order-items">
-                    <!-- JS will populate cart items -->
+                    <!-- JS will populate -->
                 </div>
                 <div class="summary-row">
                     <span>Subtotal:</span>
@@ -291,7 +257,7 @@
                                 </ul>
                             </li>
                         `;
-                        loadCartFromDB(); // ✅ Load from DB only
+                        loadCart(); // Load cart after login check
                     } else {
                         alert("Please login to checkout.");
                         window.location.href = "login.html";
@@ -311,60 +277,49 @@
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
-        // ✅ Load cart from backend (DB)
-        async function loadCartFromDB() {
+        // Load cart from localStorage (or DB in future)
+        function loadCart() {
+            const cart = getCart();
             const orderItemsContainer = document.getElementById('order-items');
             const subtotalEl = document.getElementById('subtotal');
             const totalEl = document.getElementById('total');
             const messageDiv = document.getElementById('message');
 
-            try {
-                const response = await fetch('../backend/cart-handler.php');
-                const result = await response.json();
-
-                if (result.status !== 'success') {
-                    throw new Error(result.message);
-                }
-
-                const cart = result.cart;
-
-                if (cart.length === 0) {
-                    messageDiv.innerHTML = '<div class="alert alert-error">Your cart is empty!</div>';
-                    setTimeout(() => {
-                        window.location.href = "products.html";
-                    }, 1500);
-                    return;
-                }
-
-                let subtotal = 0;
-                let cartHTML = '';
-
-                cart.forEach(item => {
-                    const itemTotal = item.price * item.qty;
-                    subtotal += itemTotal;
-
-                    cartHTML += `
-                        <div class="cart-item-small">
-                            <img src="${item.image}" alt="${item.name}">
-                            <div class="cart-item-info">
-                                <div class="cart-item-name">${item.name}</div>
-                                <div class="cart-item-qty">Qty: ${item.qty}</div>
-                                <div class="cart-item-price">₹${itemTotal.toLocaleString()}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                const totalAmount = subtotal + 50;
-
-                orderItemsContainer.innerHTML = cartHTML;
-                subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
-                totalEl.textContent = `₹${totalAmount.toLocaleString()}`;
-
-            } catch (error) {
-                messageDiv.innerHTML = `<div class="alert alert-error">Error loading cart: ${error.message}</div>`;
-                console.error("Cart Fetch Error:", error);
+            if (cart.length === 0) {
+                messageDiv.innerHTML = '<div class="alert alert-error">Your cart is empty!</div>';
+                setTimeout(() => {
+                    window.location.href = "products.html";
+                }, 1500);
+                return;
             }
+
+            let subtotal = 0;
+            let cartHTML = '';
+
+            cart.forEach(item => {
+                const product = TrendifyData.getProduct(item.id);
+                if (!product) return;
+
+                const itemTotal = product.price * item.qty;
+                subtotal += itemTotal;
+
+                cartHTML += `
+                    <div class="cart-item-small">
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${product.name}</div>
+                            <div class="cart-item-qty">Qty: ${item.qty}</div>
+                            <div class="cart-item-price">₹${itemTotal.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const totalAmount = subtotal + 50;
+
+            orderItemsContainer.innerHTML = cartHTML;
+            subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
+            totalEl.textContent = `₹${totalAmount.toLocaleString()}`;
         }
 
         // Handle form submission
@@ -387,34 +342,16 @@
                 return;
             }
 
-            if (!isValidEmail(email)) {
-                messageDiv.innerHTML = '<div class="alert alert-error">Please enter a valid email.</div>';
-                return;
-            }
-
-            // ✅ Fetch cart from DB before placing order
-            let cart, subtotal = 0;
-
-            try {
-                const res = await fetch('../backend/cart-handler.php');
-                const result = await res.json();
-
-                if (result.status !== 'success' || result.cart.length === 0) {
-                    messageDiv.innerHTML = '<div class="alert alert-error">Cart is empty or invalid.</div>';
-                    setTimeout(() => window.location.href = "cart.html", 1500);
-                    return;
-                }
-
-                cart = result.cart;
-                subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            } catch (err) {
-                messageDiv.innerHTML = '<div class="alert alert-error">Failed to verify cart.</div>';
-                console.error(err);
-                return;
-            }
+            // Get cart data
+            const cart = getCart();
+            const subtotal = cart.reduce((sum, item) => {
+                const product = TrendifyData.getProduct(item.id);
+                return sum + (product ? product.price * item.qty : 0);
+            }, 0);
 
             const totalAmount = subtotal + 50;
 
+            // Prepare order data
             const orderData = {
                 user_name: fullName,
                 email: email,
@@ -422,12 +359,10 @@
                 shipping_address: `${address}, ${city}, ${state} - ${pincode}`,
                 total_amount: totalAmount,
                 payment_method: paymentMethod,
-                payment_status: paymentMethod === 'cod' ? 'pending' : 'paid',
-                status: 'pending',
                 items: cart.map(item => ({
                     product_id: item.id,
                     quantity: item.qty,
-                    price_per_unit: item.price
+                    price_per_unit: TrendifyData.getProduct(item.id)?.price || 0
                 }))
             };
 
@@ -445,23 +380,16 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // ✅ Clear cart from DB
-                    await fetch('../backend/cart-handler.php', {
-                        method: 'DELETE'
-                    });
+                    // Clear cart after success
+                    localStorage.removeItem('trendify_cart');
+                    updateCartBadge();
 
-                    // ✅ Big success prompt
                     messageDiv.innerHTML = `
-                        <div class="alert alert-success" style="text-align:center; font-size:1.2rem;">
+                        <div class="alert alert-success" style="text-align:center;">
                             🎉 Order placed successfully!<br>
-                            <strong>Order #${result.order_number}</strong><br>
                             Redirecting to confirmation...
                         </div>
                     `;
-
-                    // Clear local badge
-                    localStorage.removeItem('trendify_cart');
-                    updateCartBadge();
 
                     setTimeout(() => {
                         window.location.href = 'order-confirmation.html?order=' + result.order_number;
@@ -476,11 +404,6 @@
                 document.querySelector('.place-order-btn').disabled = false;
             }
         });
-
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
     </script>
 </body>
 
