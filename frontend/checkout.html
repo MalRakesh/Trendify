@@ -288,8 +288,8 @@
             const totalEl = document.getElementById('total');
             const messageDiv = document.getElementById('message');
 
-            // Debug: Check if cart exists
-            console.log("Cart:", cart);
+            // ✅ Clear any previous message
+            messageDiv.innerHTML = '';
 
             if (!Array.isArray(cart) || cart.length === 0) {
                 messageDiv.innerHTML = '<div class="alert alert-error">Your cart is empty!</div>';
@@ -304,10 +304,7 @@
 
             cart.forEach(item => {
                 const product = TrendifyData.getProduct(item.id);
-                if (!product) {
-                    console.warn(`Product not found for ID: ${item.id}`);
-                    return;
-                }
+                if (!product) return;
 
                 const itemTotal = product.price * item.qty;
                 subtotal += itemTotal;
@@ -351,7 +348,7 @@
                 return;
             }
 
-            // Get cart data
+            // ✅ Re-fetch cart before placing order
             const cart = getCart();
             if (!Array.isArray(cart) || cart.length === 0) {
                 messageDiv.innerHTML = '<div class="alert alert-error">Cart is empty or invalid.</div>';
@@ -366,7 +363,6 @@
 
             const totalAmount = subtotal + 50;
 
-            // Prepare order data
             const orderData = {
                 user_name: fullName,
                 email: email,
