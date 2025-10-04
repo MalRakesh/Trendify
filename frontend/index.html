@@ -114,22 +114,50 @@
             </div>
         </section>
 
-        <!-- Testimonials -->
-        <section class="testimonials" style="margin: 4rem 0; padding: 3rem; background: #f1f1f1; border-radius: 10px;">
-            <h2>What Our Customers Say</h2>
-            <div style="display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap;">
-                <div
-                    style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <p>"Amazing quality and fast delivery! Will shop again."</p>
-                    <strong>- Priya S.</strong>
-                </div>
-                <div
-                    style="flex: 1; min-width: 250px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <p>"Trendy clothes at great prices. Love this store!"</p>
-                    <strong>- Rohan K.</strong>
-                </div>
-            </div>
-        </section>
+<!-- Testimonials - Auto-Scrolling Carousel -->
+<section class="testimonials"
+    style="margin: 4rem 0; padding: 3rem; background: #f8f9fa; border-radius: 12px; text-align: center;">
+    <h2>What Our Customers Say</h2>
+    <p class="subtitle" style="color: #666; margin-top: 0.5rem;">Trusted by thousands of happy shoppers</p>
+
+    <!-- Testimonial Slider -->
+    <div class="testimonial-slider" style="
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 2rem;
+        padding: 1rem 0;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        position: relative;
+    ">
+        <!-- Testimonials will be added here dynamically -->
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+        <button id="prev-testimonial" style="
+            width: 40px; height: 40px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        "> <
+            </button>
+                <button id="next-testimonial" style="
+            width: 40px; height: 40px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        ">></button>
+    </div>
+</section>
 
         <!-- Newsletter -->
         <section class="newsletter"
@@ -181,6 +209,97 @@
             });
         }
     </script>
+
+
+
+<script>
+    // Array of 10+ testimonials
+    const testimonials = [
+        { text: "Amazing quality and fast delivery! Will shop again.", author: "Mayank Solanki" },
+        { text: "Trendy clothes at great prices. Love this store!", author: "Ankit Pal" },
+        { text: "Best online fashion store I've ever used. Packaging was perfect!", author: "Abhishek Pal" },
+        { text: "Got my order in just 2 days. Super impressed with service.", author: "Raj Gupta" },
+        { text: "Clothes fit perfectly and look exactly like the pictures. 10/10", author: "Suraj Yadav" },
+        { text: "Customer support is very responsive. Great shopping experience.", author: "Amit Yadav" },
+        { text: "Unique designs you won't find anywhere else. My go-to fashion site.", author: "Om Singh" },
+        { text: "Value for money is excellent. Quality exceeds the price point.", author: "Rupesh Mahato" },
+        { text: "Love how sustainable their packaging is. Eco-friendly brand!", author: "Rakshit Dhakan" },
+        { text: "Every delivery feels like a premium unboxing experience.", author: "Jay Soni" },
+        { text: "Finally a store that understands Indian body types. Perfect fits!", author: "Suraj Dhariya" },
+        { text: "Fast shipping, no delays. Always on time!", author: "Shaun Moses" }
+    ];
+
+    // DOM Elements
+    const slider = document.querySelector('.testimonial-slider');
+    const prevBtn = document.getElementById('prev-testimonial');
+    const nextBtn = document.getElementById('next-testimonial');
+
+    // Duplicate testimonials for infinite scroll feel
+    const duplicatedTestimonials = [...testimonials, ...testimonials];
+
+    // Create and append testimonial cards
+    function createTestimonials() {
+        slider.innerHTML = '';
+        duplicatedTestimonials.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'testimonial-card';
+            card.style = `
+            flex: 0 0 300px;
+            min-width: 280px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        `;
+            card.innerHTML = `
+            <p style="font-style: italic; color: #333; line-height: 1.6;">"${t.text}"</p>
+            <strong style="display: block; margin-top: 1rem; color: #2c3e50;">- ${t.author}</strong>
+        `;
+            slider.appendChild(card);
+        });
+    }
+
+    // Auto scroll
+    let scrollInterval = setInterval(() => {
+        slider.scrollLeft += 310; // Move by card width + gap
+        if (slider.scrollLeft >= slider.scrollWidth / 2) {
+            slider.scrollLeft = 0; // Reset to start (seamless loop)
+        }
+    }, 3000);
+
+    // Manual navigation
+    prevBtn.addEventListener('click', () => {
+        slider.scrollLeft -= 310;
+        if (slider.scrollLeft <= 0) {
+            slider.scrollLeft = slider.scrollWidth / 2;
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        slider.scrollLeft += 310;
+        if (slider.scrollLeft >= slider.scrollWidth / 2) {
+            slider.scrollLeft = 0;
+        }
+    });
+
+    // Pause auto-scroll on hover
+    slider.addEventListener('mouseenter', () => {
+        clearInterval(scrollInterval);
+    });
+
+    slider.addEventListener('mouseleave', () => {
+        scrollInterval = setInterval(() => {
+            slider.scrollLeft += 310;
+            if (slider.scrollLeft >= slider.scrollWidth / 2) {
+                slider.scrollLeft = 0;
+            }
+        }, 3000);
+    });
+
+    // Initialize
+    createTestimonials();
+</script>
 </body>
 
 </html>
